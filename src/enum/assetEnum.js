@@ -5,3 +5,5 @@ export const images = {
   bomb: { key: 'bomb', path: 'assets/bomb.png' },
   dude: { key: 'dude', path: 'assets/dude.png' }
 }
+
+export const gameScene = 'game-scene'

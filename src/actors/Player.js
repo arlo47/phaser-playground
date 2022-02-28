@@ -4,19 +4,50 @@ import { images } from '../enum/assetEnum'
 
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y) {
-    super(scene, x, y, images.key.dude)
-    const player = this.createPlayer();
-    return player
+  constructor(scene, x, y, texture = images.dude.key) {
+    super(scene, x, y, texture)
+    // two lins to add physics to the sprite
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
+
+    this.create(scene)
+    return this;
   }
 
-  // generate player
-  createPlayer() {
-    // select sprite for player, add physics to it.
-    const player = this.player = this.physics.add.sprite(100, 450, 'dude')
-    this.player.setBounce(0.2)
-    this.player.setCollideWorldBounds(true)
-    
+  create(scene) {
+    this.setCollideWorldBounds(true)
+    this.setBounce(0.2)
+    this.setKeybinds()
+
+    // bind additional keys to actions (default arrow keys. This adds WASD)
+    scene.cursors = scene.input.keyboard.addKeys({
+      up: Phaser.Input.Keyboard.KeyCodes.W,
+      down: Phaser.Input.Keyboard.KeyCodes.S,
+      left: Phaser.Input.Keyboard.KeyCodes.A,
+      right: Phaser.Input.Keyboard.KeyCodes.D
+    });
+  }
+
+  
+  update(cursors) {
+    if (cursors.left.isDown) {
+      this.setVelocityX(-160)
+      this.anims.play('left', true)
+    } else if (cursors.right.isDown) {
+      this.setVelocityX(160)
+      this.anims.play('right', true)
+    } else {
+      this.setVelocityX(0)
+      this.anims.play('turn')
+    }
+
+    if (cursors.up.isDown && this.body.touching.down) {
+      this.setVelocityY(-330)
+    }
+  }
+
+  // bind spritesheet frames to actions
+  setKeybinds() {
     // keybind sprite frame changes to moving left
     this.anims.create({
       key: 'left',
@@ -39,8 +70,5 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       frameRate: 10,
       repeat: -1
     })
-  
-    // return player so it can be physics can be added in create()
-    return player;
   }
 }
